@@ -1,3 +1,4 @@
+from matplotlib.pyplot import axis
 import numpy as np 
 import pandas as pd 
 # IMPORTANT: DO NOT USE ANY OTHER 3RD PARTY PACKAGES
@@ -9,9 +10,9 @@ class KMeans:
     def __init__(self):
         # NOTE: Feel free add any hyperparameters 
         # (with defaults) as you see fit
-        pass
+        self.centroides = np.zeros((2,2))
         
-    def fit(self, X):
+    def fit(self, X_panda):
         """
         Estimates parameters for the classifier
         
@@ -20,7 +21,34 @@ class KMeans:
                 m rows (#samples) and n columns (#features)
         """
         # TODO: Implement
-        raise NotImplementedError()
+        
+        X = np.asarray(X_panda)
+        self.centroides = X[:2,:]
+        
+        z = self.predict(X)
+        old_z = np.zeros(len(z))
+        
+        while np.any(z != old_z):
+            self.set_new_average_centroides(X, z) 
+            old_z = z
+            z = self.predict(X)
+        
+    
+    def set_new_average_centroides(self, X, z):        
+        X_c0 = np.empty((1,2)) # Create dummy element for appending points
+        X_c1 = np.empty((1,2))
+
+        for i in range(len(X)):
+            if z[i] == 0: 
+                X_c0 = np.block([[X_c0], [X[i]]])
+            else:
+                X_c1 = np.block([[X_c1], [X[i]]])
+        
+        X_c0 = np.delete(X_c0, 0, 0) # remove first dummy element
+        X_c1 = np.delete(X_c1, 0, 0)
+        
+        self.centroides[0] = np.average(X_c0, axis=0)
+        self.centroides[1] = np.average(X_c1, axis=0)
     
     def predict(self, X):
         """
@@ -37,9 +65,19 @@ class KMeans:
             for each point. E.g., if X is a 10xn matrix and 
             there are 3 clusters, then a possible assignment
             could be: array([2, 0, 0, 1, 2, 1, 1, 0, 2, 2])
-        """
-        # TODO: Implement 
-        raise NotImplementedError()
+        """        
+        x = np.asarray(X)
+        z = np.zeros(len(x))
+        
+        for i in range(len(x)):
+            dist_c0 = euclidean_distance(x[i], self.centroides[0])
+            dist_c1 = euclidean_distance(x[i], self.centroides[1])
+            
+            if dist_c0 < dist_c1: z[i] = 0
+            else: z[i] = 1
+        
+        return z.astype(int)
+    
     
     def get_centroids(self):
         """
@@ -56,8 +94,7 @@ class KMeans:
             [xm_1, xm_2, ..., xm_n]
         ])
         """
-        # TODO: Implement 
-        raise NotImplementedError()
+        return self.centroides
     
     
     
@@ -163,3 +200,9 @@ def euclidean_silhouette(X, z):
     b = (D + inf_mask).min(axis=1)
     
     return np.mean((b - a) / np.maximum(a, b))
+
+def array_is_equal(a, b, margin=0.0001):
+    for i in range(len(a)):
+        if (a[i] > b[i] + margin) or (a[i] < b[i] - margin):
+            return False
+    return True

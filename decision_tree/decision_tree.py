@@ -1,7 +1,18 @@
 import numpy as np 
 import pandas as pd 
 # IMPORTANT: DO NOT USE ANY OTHER 3RD PARTY PACKAGES
-# (math, random, collections, functools, etc. are perfectly fine)
+# (math, random, collections, functools, etc. are perfectly fine)    
+
+class LeafNode:
+    def __init__(self):
+        self.value = 0;
+
+class DecisionNode:
+    def __init__(self):
+        self.left_child = None;
+        self.right_child = None;
+        self.decision_attribute = None;
+        self.decision_value = None;
 
 
 class DecisionTree:
@@ -22,6 +33,24 @@ class DecisionTree:
             y (pd.Series): a vector of discrete ground-truth labels
         """
         # TODO: Implement 
+        
+        entropy_per_question = []
+        
+        columns = X.columns
+        for col in columns:
+            # Find unique values in coloum
+            uniqe_attr = X[col].unique()
+            for attr in uniqe_attr:
+                print(X[col].loc[X[col] == attr])
+                
+            
+            
+            entropy_input = find_entropy_input_array(X[col])
+            print(entropy_input)
+
+        
+        
+        
         raise NotImplementedError()
     
     def predict(self, X):
@@ -102,5 +131,10 @@ def entropy(counts):
     probs = probs[probs > 0]  # Avoid log(0)
     return - np.sum(probs * np.log2(probs))
 
+
+def find_entropy_input_array(y_pandas):
+    y = np.asarray(y_pandas)
+    _, counts = np.unique(y, return_counts=True)
+    return counts.astype(int)
 
 

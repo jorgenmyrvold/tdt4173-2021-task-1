@@ -7,10 +7,9 @@ import pandas as pd
 
 class KMeans:
     
-    def __init__(self):
-        # NOTE: Feel free add any hyperparameters 
-        # (with defaults) as you see fit
-        self.centroides = np.zeros((2,2))
+    def __init__(self, k=2):
+        self.k = k
+        self.centroides = np.zeros((k,2))
         
     def fit(self, X_panda):
         """
@@ -20,35 +19,29 @@ class KMeans:
             X (array<m,n>): a matrix of floats with
                 m rows (#samples) and n columns (#features)
         """
-        # TODO: Implement
-        
         X = np.asarray(X_panda)
-        self.centroides = X[:2,:]
+        self.centroides = X[:self.k, :]
+        X -= np.mean(X, axis=0)
+        X /= np.std(X, axis=0)
         
         z = self.predict(X)
         old_z = np.zeros(len(z))
         
-        while np.any(z != old_z):
+        while (np.any(z != old_z)):
             self.set_new_average_centroides(X, z) 
             old_z = z
             z = self.predict(X)
-        
     
     def set_new_average_centroides(self, X, z):        
-        X_c0 = np.empty((1,2)) # Create dummy element for appending points
-        X_c1 = np.empty((1,2))
+        X_c = [np.empty((1, 2))] * self.k  # Array containing points with first index as current cluster
 
-        for i in range(len(X)):
-            if z[i] == 0: 
-                X_c0 = np.block([[X_c0], [X[i]]])
-            else:
-                X_c1 = np.block([[X_c1], [X[i]]])
+        for i in range(len(z)):
+            X_c[z[i]] = np.block([[X_c[z[i]]], [X[i]]])
         
-        X_c0 = np.delete(X_c0, 0, 0) # remove first dummy element
-        X_c1 = np.delete(X_c1, 0, 0)
-        
-        self.centroides[0] = np.average(X_c0, axis=0)
-        self.centroides[1] = np.average(X_c1, axis=0)
+        for i in range(self.k):
+            X_c[i] = np.delete(X_c[i], 0, axis=0)
+            self.centroides[i] = np.average(X_c[i], axis=0)
+
     
     def predict(self, X):
         """
@@ -68,13 +61,10 @@ class KMeans:
         """        
         x = np.asarray(X)
         z = np.zeros(len(x))
+        dist = cross_euclidean_distance(x, self.centroides)
         
         for i in range(len(x)):
-            dist_c0 = euclidean_distance(x[i], self.centroides[0])
-            dist_c1 = euclidean_distance(x[i], self.centroides[1])
-            
-            if dist_c0 < dist_c1: z[i] = 0
-            else: z[i] = 1
+            z[i] = np.argmin(dist[i])
         
         return z.astype(int)
     

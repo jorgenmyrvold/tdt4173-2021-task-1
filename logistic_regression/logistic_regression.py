@@ -9,9 +9,10 @@ class LogisticRegression:
     def __init__(self):
         # NOTE: Feel free add any hyperparameters 
         # (with defaults) as you see fit
-        pass
+        self.theta = np.array([[1,1]])
         
-    def fit(self, X, y):
+        
+    def fit(self, X_panadas, y_pandas):
         """
         Estimates parameters for the classifier
         
@@ -22,9 +23,22 @@ class LogisticRegression:
                 m binary 0.0/1.0 labels
         """
         # TODO: Implement
-        raise NotImplemented()
+        X, y = np.asarray(X_panadas).T, np.asarray(y_pandas)
+        learning_rate = 0.01
+        last_change = 99999
+        
+        print(np.sum(np.array([1,2]) - np.array([2,1])))
+
+        while(last_change > 0.001):
+            prev_theta = self.theta
+            self.theta = self.theta + learning_rate * (np.sum(y) - np.sum(self.h(X)) * np.sum(X, axis=1))
+            last_change = np.sum(prev_theta - self.theta)
+      
+    def h(self, x):
+        return 1 / (1 + np.e ** (-self.theta @ x))
+
     
-    def predict(self, X):
+    def predict(self, X_pandas):
         """
         Generates predictions
         
@@ -39,9 +53,9 @@ class LogisticRegression:
             with probability-like predictions
         """
         # TODO: Implement
-        raise NotImplemented()
-        
-
+        X = np.asarray(X_pandas)
+        return (1 / (1 + np.e ** (-self.theta @ X.T))).reshape(len(X))
+    
         
 # --- Some utility functions 
 
@@ -97,4 +111,14 @@ def sigmoid(x):
     """
     return 1. / (1. + np.exp(-x))
 
-        
+def logit(x):
+    """
+    Transforms to log
+    """
+    return np.log(x/(1-x))
+
+def inverse_logit(x):
+    """
+    Transforms back to not-log
+    """
+    return (np.e ** np.log(x)) / (1 + (np.e ** np.log(x)))

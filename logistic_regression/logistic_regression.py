@@ -9,7 +9,7 @@ class LogisticRegression:
     def __init__(self):
         # NOTE: Feel free add any hyperparameters 
         # (with defaults) as you see fit
-        self.theta = np.array([[1,1]])
+        self.theta = np.array([1, 1, 0])
         
         
     def fit(self, X_panadas, y_pandas):
@@ -24,18 +24,18 @@ class LogisticRegression:
         """
         # TODO: Implement
         X, y = np.asarray(X_panadas).T, np.asarray(y_pandas)
-        learning_rate = 0.01
-        last_change = 99999
+        X = np.concatenate([X, np.ones((1,len(y)))])
+        print(X.shape)
+        learning_rate = 1
         
-        print(np.sum(np.array([1,2]) - np.array([2,1])))
-
-        while(last_change > 0.001):
-            prev_theta = self.theta
-            self.theta = self.theta + learning_rate * (np.sum(y) - np.sum(self.h(X)) * np.sum(X, axis=1))
-            last_change = np.sum(prev_theta - self.theta)
+        for epoch in range(100):
+            error = y - self.h(X)
+            # import pdb; pdb.set_trace()
+            gradient = X @ error
+            self.theta = self.theta + learning_rate * gradient/len(y)
       
     def h(self, x):
-        return 1 / (1 + np.e ** (-self.theta @ x))
+        return (1 / (1 + np.exp(-self.theta @ x)))
 
     
     def predict(self, X_pandas):
@@ -53,8 +53,9 @@ class LogisticRegression:
             with probability-like predictions
         """
         # TODO: Implement
-        X = np.asarray(X_pandas)
-        return (1 / (1 + np.e ** (-self.theta @ X.T))).reshape(len(X))
+        X = np.asarray(X_pandas).T
+        X = np.concatenate([X, np.ones((1,X.shape[1]))])
+        return self.h(X)
     
         
 # --- Some utility functions 

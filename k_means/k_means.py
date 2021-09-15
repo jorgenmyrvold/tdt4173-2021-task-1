@@ -8,7 +8,7 @@ import pandas as pd
 class KMeans:
     
     def __init__(self, k=2):
-        self.k = k
+        self.k = k  # Number of clusters
         self.centroides = np.zeros((k,2))
         
     def fit(self, X_panda):
@@ -28,20 +28,19 @@ class KMeans:
         old_z = np.zeros(len(z))
         
         while (np.any(z != old_z)):
-            self.set_new_average_centroides(X, z) 
+            self.calculate_new_centroides(X, z) 
             old_z = z
             z = self.predict(X)
     
-    def set_new_average_centroides(self, X, z):        
+    def calculate_new_centroides(self, X, z):        
         X_c = [np.empty((1, 2))] * self.k  # Array containing points with first index as current cluster
 
         for i in range(len(z)):
             X_c[z[i]] = np.block([[X_c[z[i]]], [X[i]]])
         
         for i in range(self.k):
-            X_c[i] = np.delete(X_c[i], 0, axis=0)
+            X_c[i] = np.delete(X_c[i], 0, axis=0) # Remove first dummy element that is used to initialize array
             self.centroides[i] = np.average(X_c[i], axis=0)
-
     
     def predict(self, X):
         """
@@ -68,7 +67,6 @@ class KMeans:
         
         return z.astype(int)
     
-    
     def get_centroids(self):
         """
         Returns the centroids found by the K-mean algorithm
@@ -87,10 +85,7 @@ class KMeans:
         return self.centroides
     
     
-    
-    
 # --- Some utility functions 
-
 
 def euclidean_distortion(X, z):
     """

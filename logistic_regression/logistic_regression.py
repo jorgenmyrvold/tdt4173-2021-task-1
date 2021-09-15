@@ -7,11 +7,8 @@ import pandas as pd
 class LogisticRegression:
     
     def __init__(self):
-        # NOTE: Feel free add any hyperparameters 
-        # (with defaults) as you see fit
         self.theta = np.array([1, 1, 0])
-        
-        
+
     def fit(self, X_panadas, y_pandas):
         """
         Estimates parameters for the classifier
@@ -22,21 +19,17 @@ class LogisticRegression:
             y (array<m>): a vector of floats containing 
                 m binary 0.0/1.0 labels
         """
-        # TODO: Implement
         X, y = np.asarray(X_panadas).T, np.asarray(y_pandas)
         X = np.concatenate([X, np.ones((1,len(y)))])
-        print(X.shape)
         learning_rate = 1
         
         for epoch in range(100):
             error = y - self.h(X)
-            # import pdb; pdb.set_trace()
             gradient = X @ error
             self.theta = self.theta + learning_rate * gradient/len(y)
       
     def h(self, x):
         return (1 / (1 + np.exp(-self.theta @ x)))
-
     
     def predict(self, X_pandas):
         """
@@ -52,7 +45,6 @@ class LogisticRegression:
             A length m array of floats in the range [0, 1]
             with probability-like predictions
         """
-        # TODO: Implement
         X = np.asarray(X_pandas).T
         X = np.concatenate([X, np.ones((1,X.shape[1]))])
         return self.h(X)
@@ -111,15 +103,3 @@ def sigmoid(x):
         Element-wise sigmoid activations of the input 
     """
     return 1. / (1. + np.exp(-x))
-
-def logit(x):
-    """
-    Transforms to log
-    """
-    return np.log(x/(1-x))
-
-def inverse_logit(x):
-    """
-    Transforms back to not-log
-    """
-    return (np.e ** np.log(x)) / (1 + (np.e ** np.log(x)))

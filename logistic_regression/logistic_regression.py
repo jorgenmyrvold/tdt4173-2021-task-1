@@ -1,25 +1,27 @@
 import numpy as np 
 import pandas as pd 
-# IMPORTANT: DO NOT USE ANY OTHER 3RD PARTY PACKAGES
-# (math, random, collections, functools, etc. are perfectly fine)
 
 
 class LogisticRegression:
     
     def __init__(self):
+        # Added a 3rd theta to compensate for the bias
         self.theta = np.array([1, 1, 0])
 
-    def fit(self, X_panadas, y_pandas):
+    def fit(self, X_df, y_df):
         """
         Estimates parameters for the classifier
         
         Args:
-            X (array<m,n>): a matrix of floats with
+            X_df (array<m,n>): a matrix of floats with
                 m rows (#samples) and n columns (#features)
-            y (array<m>): a vector of floats containing 
+            y_df (array<m>): a vector of floats containing 
                 m binary 0.0/1.0 labels
         """
-        X, y = np.asarray(X_panadas).T, np.asarray(y_pandas)
+        X, y = np.asarray(X_df).T, np.asarray(y_df)
+        
+        # Added ones is to make X homogenous so the bias can be
+        # computed with the 3rd theta param
         X = np.concatenate([X, np.ones((1,len(y)))])
         learning_rate = 1
         
@@ -31,21 +33,21 @@ class LogisticRegression:
     def h(self, x):
         return (1 / (1 + np.exp(-self.theta @ x)))
     
-    def predict(self, X_pandas):
+    def predict(self, X_df):
         """
         Generates predictions
         
         Note: should be called after .fit()
         
         Args:
-            X (array<m,n>): a matrix of floats with 
+            X_df (array<m,n>): a matrix of floats with 
                 m rows (#samples) and n columns (#features)
             
         Returns:
             A length m array of floats in the range [0, 1]
             with probability-like predictions
         """
-        X = np.asarray(X_pandas).T
+        X = np.asarray(X_df).T
         X = np.concatenate([X, np.ones((1,X.shape[1]))])
         return self.h(X)
     

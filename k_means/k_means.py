@@ -1,8 +1,6 @@
 from matplotlib.pyplot import axis
 import numpy as np 
 import pandas as pd 
-# IMPORTANT: DO NOT USE ANY OTHER 3RD PARTY PACKAGES
-# (math, random, collections, functools, etc. are perfectly fine)
 
 
 class KMeans:
@@ -16,7 +14,7 @@ class KMeans:
         Estimates parameters for the classifier
         
         Args:
-            X (array<m,n>): a matrix of floats with
+            X_panda (array<m,n>): a matrix of floats with
                 m rows (#samples) and n columns (#features)
         """
         X = np.asarray(X_panda)
